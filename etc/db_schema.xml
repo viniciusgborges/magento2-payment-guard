@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="vbdev_payment_guard_logs" resource="default" engine="innodb"
+           comment="Vbdev Payment Guard Logs">
+        <column xsi:type="int" name="entity_id" unsigned="false" nullable="false" identity="true"
+                comment="Payment Guard Logs ID"/>
+        <column xsi:type="varchar" name="user_ip" nullable="false" length="255" comment="IP"/>
+        <column xsi:type="text" name="user_emails" nullable="true" comment="User Emails"/>
+        <column xsi:type="varchar" name="store" nullable="true" length="255" comment="store"/>
+        <column xsi:type="varchar" name="blacklist_status" nullable="true" length="32" comment="Blacklist Status"/>
+        <column xsi:type="timestamp" name="last_attempt" on_update="true" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Last Attempt date"/>
+        <column xsi:type="bigint" name="attempts" nullable="false" comment="Attempts"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="VBDEV_PAYMENT_GUARD_LOGS_USER_IP">
+            <column name="user_ip"/>
+        </constraint>
+        <index referenceId="VBDEV_PAYMENT_GUARD_LOGS_INDEX_STORE" indexType="btree">
+            <column name="store"/>
+        </index>
+        <index referenceId="VBDEV_PAYMENT_GUARD_LOGS_INDEX_BLACKLIST_STATUS" indexType="btree">
+            <column name="blacklist_status"/>
+        </index>
+        <index referenceId="VBDEV_PAYMENT_GUARD_LOGS_FULLTEXT" indexType="fulltext">
+            <column name="user_emails"/>
+            <column name="store"/>
+            <column name="blacklist_status"/>
+        </index>
+    </table>
+
+    <table name="vbdev_payment_guard_blacklist" resource="default" engine="innodb"
+           comment="Vbdev Payment Guard Blacklist">
+        <column xsi:type="int" name="entity_id" unsigned="false" nullable="false" identity="true"
+                comment="Payment Guard Blacklist ID"/>
+        <column xsi:type="varchar" name="user_ip" nullable="false" length="255" comment="IP"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="VBDEV_PAYMENT_GUARD_BLACKLIST_USER_IP">
+            <column name="user_ip"/>
+        </constraint>
+    </table>
+
+    <table name="vbdev_payment_guard_order_attempts" resource="default" engine="innodb"
+           comment="Vbdev Payment Guard Order Attempts">
+        <column xsi:type="bigint" name="entity_id" unsigned="false" nullable="false" identity="true"
+                comment="Payment Guard Order Attempts ID"/>
+        <column xsi:type="int" name="user_id" nullable="false" comment="User Id"/>
+        <column xsi:type="varchar" name="user_ip" nullable="false" length="255" comment="IP"/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Attempt Created at"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+    </table>
+</schema>
