@@ -1,0 +1,9 @@
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
+    <group id="default">
+        <job instance="Vbdev\PaymentGuard\Cron\ClearPaymentGuardOrderAttempts" method="execute"
+             name="payment_guard_clear_table_cron">
+            <schedule>0 0 1 * *</schedule>
+        </job>
+    </group>
+</config>
