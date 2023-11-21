@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Acl/etc/acl.xsd">
+    <acl>
+        <resources>
+            <resource id="Magento_Backend::admin">
+                <resource id="Vbdev_PaymentGuard::menu" title="Payment Guard" sortOrder="400">
+                    <resource id="Vbdev_PaymentGuard::logs" title="Logs" sortOrder="10">
+                        <resource id="Vbdev_PaymentGuard::mass_delete" title="Mass Delete" sortOrder="10"/>
+                        <resource id="Vbdev_PaymentGuard::mass_add_to_blacklist" title="Mass Add To Blacklist"
+                                  sortOrder="20"/>
+                        <resource id="Vbdev_PaymentGuard::remove_from_blacklist" title="Mass Remove From Blacklist"
+                                  sortOrder="30"/>
+                    </resource>
+                </resource>
+                <resource id="Magento_Backend::stores">
+                    <resource id="Magento_Backend::stores_settings">
+                        <resource id="Vbdev_PaymentGuard::vbdev_config"
+                                  title="Payment Guard Configuration" sortOrder="50" translate="title"/>
+                    </resource>
+                </resource>
+            </resource>
+        </resources>
+    </acl>
+</config>
