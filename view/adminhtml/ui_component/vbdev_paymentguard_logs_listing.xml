@@ -1,0 +1,167 @@
+<?xml version="1.0" ?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">
+                vbdev_paymentguard_logs_listing.vbdev_paymentguard_logs_listing_data_source
+            </item>
+        </item>
+    </argument>
+    <settings>
+        <deps>
+            <dep>vbdev_paymentguard_logs_listing.vbdev_paymentguard_logs_listing_data_source</dep>
+        </deps>
+        <spinner>vbdev_paymentguard_logs_columns</spinner>
+    </settings>
+    <dataSource name="vbdev_paymentguard_logs_listing_data_source" component="Magento_Ui/js/grid/provider">
+        <settings>
+            <updateUrl path="mui/index/render"/>
+            <storageConfig>
+                <param name="indexField" xsi:type="string">entity_id</param>
+            </storageConfig>
+        </settings>
+        <dataProvider name="vbdev_paymentguard_logs_listing_data_source"
+                      class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider">
+            <settings>
+                <requestFieldName>id</requestFieldName>
+                <primaryFieldName>entity_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+    <listingToolbar name="listing_top">
+        <settings>
+            <sticky>true</sticky>
+        </settings>
+        <bookmark name="bookmarks"/>
+        <columnsControls name="columns_controls"/>
+        <filterSearch name="fulltext"/>
+        <filters name="listing_filters">
+            <argument name="data" xsi:type="array">
+                <item name="observers" xsi:type="array">
+                    <item name="column" xsi:type="string">column</item>
+                </item>
+            </argument>
+            <settings>
+                <templates>
+                    <filters>
+                        <select>
+                            <param name="template" xsi:type="string">ui/grid/filters/elements/ui-select</param>
+                            <param name="component" xsi:type="string">Magento_Ui/js/form/element/ui-select</param>
+                        </select>
+                    </filters>
+                </templates>
+            </settings>
+        </filters>
+        <massaction name="listing_massaction" component="Magento_Ui/js/grid/tree-massactions">
+            <settings>
+                <selectProvider>
+                    vbdev_paymentguard_logs_listing.vbdev_paymentguard_logs_listing.vbdev_paymentguard_logs_columns.ids
+                </selectProvider>
+                <indexField>entity_id</indexField>
+            </settings>
+            <action name="delete">
+                <settings>
+                    <type>delete</type>
+                    <label translate="true">Delete</label>
+                    <url path="paymentguard/logs/massDelete"/>
+                    <confirm>
+                        <title translate="true">Delete items</title>
+                        <message translate="true">Are you sure you want to delete the selected items?</message>
+                    </confirm>
+                </settings>
+            </action>
+            <action name="add_to_blacklist">
+                <settings>
+                    <type>add_to_blacklist</type>
+                    <label translate="true">Add To Blacklist</label>
+                    <url path="paymentguard/logs/massAddToBlacklist"/>
+                    <confirm>
+                        <title translate="true">Add To Blacklist items</title>
+                        <message translate="true">Are you sure you want to blacklist the selected items?</message>
+                    </confirm>
+                </settings>
+            </action>
+            <action name="remove_from_blacklist">
+                <settings>
+                    <type>remove_from_blacklist</type>
+                    <label translate="true">Remove From Blacklist</label>
+                    <url path="paymentguard/logs/massRemoveFromBlacklist"/>
+                    <confirm>
+                        <title translate="true">Remove items from Blacklist</title>
+                        <message translate="true">Are you sure you want remove selected items from blacklist?</message>
+                    </confirm>
+                </settings>
+            </action>
+        </massaction>
+    </listingToolbar>
+    <columns name="vbdev_paymentguard_logs_columns">
+        <selectionsColumn name="ids">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="indexField" xsi:type="string">entity_id</item>
+                    <item name="sorting" xsi:type="string">desc</item>
+                    <item name="sortOrder" xsi:type="number">0</item>
+                </item>
+            </argument>
+        </selectionsColumn>
+        <column name="entity_id">
+            <settings>
+                <label translate="true">ID</label>
+                <filter>textRange</filter>
+                <sorting>desc</sorting>
+            </settings>
+        </column>
+        <column name="user_ip">
+            <settings>
+                <label translate="true">User IP</label>
+                <filter>text</filter>
+            </settings>
+        </column>
+        <column name="user_emails">
+            <settings>
+                <label translate="true">User Emails</label>
+                <filter>text</filter>
+                <bodyTmpl>ui/grid/cells/html</bodyTmpl>
+            </settings>
+        </column>
+        <column name="store">
+            <settings>
+                <label translate="true">Store</label>
+                <filter>text</filter>
+            </settings>
+        </column>
+        <column name="last_attempt" class="Magento\Ui\Component\Listing\Columns\Date"
+                component="Magento_Ui/js/grid/columns/date">
+            <settings>
+                <filter>dateRange</filter>
+                <dataType>date</dataType>
+                <label translate="true">Last Attempt</label>
+            </settings>
+        </column>
+        <column name="attempts">
+            <settings>
+                <label translate="true">Attempts</label>
+                <filter>text</filter>
+            </settings>
+        </column>
+        <column name="blacklist_status" component="Magento_Ui/js/grid/columns/select">
+            <settings>
+                <filter>select</filter>
+                <dataType>select</dataType>
+                <label translate="true">Blacklist Status</label>
+                <visible>true</visible>
+                <options>
+                    <option name="0" xsi:type="array">
+                        <item name="value" xsi:type="string">blocked</item>
+                        <item name="label" xsi:type="string" translate="true">Blocked</item>
+                    </option>
+                    <option name="1" xsi:type="array">
+                        <item name="value" xsi:type="string">unlocked</item>
+                        <item name="label" xsi:type="string" translate="true">Unlocked</item>
+                    </option>
+                </options>
+            </settings>
+        </column>
+    </columns>
+</listing>
