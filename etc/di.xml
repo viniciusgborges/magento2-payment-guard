@@ -27,4 +27,57 @@
     <type name="Magento\Checkout\Api\GuestPaymentInformationManagementInterface">
         <plugin name="restrict_guest_place_order" type="Vbdev\PaymentGuard\Plugin\GuestPaymentInfoManagement"/>
     </type>
+
+    <!-- Proxys -->
+    <type name="Vbdev\PaymentGuard\Service\CaptureCustomerInfos">
+        <arguments>
+            <argument name="session" xsi:type="object">Magento\Customer\Model\Session\Proxy</argument>
+            <argument name="storeManager" xsi:type="object">Magento\Store\Model\StoreManagerInterface\Proxy</argument>
+            <argument name="remoteAddress" xsi:type="object">Magento\Framework\HTTP\PhpEnvironment\RemoteAddress\Proxy</argument>
+            <argument name="logger" xsi:type="object">Psr\Log\LoggerInterface\Proxy</argument>
+        </arguments>
+    </type>
+
+    <type name="Vbdev\PaymentGuard\Service\PaymentGuardLogsService">
+        <arguments>
+            <argument name="captureCustomerInfos" xsi:type="object">Vbdev\PaymentGuard\Service\CaptureCustomerInfos\Proxy</argument>
+            <argument name="paymentGuardLogs" xsi:type="object">Vbdev\PaymentGuard\Model\PaymentGuardLogsFactory\Proxy</argument>
+            <argument name="resourcePaymentGuardLogs" xsi:type="object">Vbdev\PaymentGuard\Model\ResourceModel\PaymentGuardLogsFactory\Proxy</argument>
+            <argument name="collectionFactory" xsi:type="object">Vbdev\PaymentGuard\Model\ResourceModel\PaymentGuardLogs\CollectionFactory\Proxy</argument>
+            <argument name="logger" xsi:type="object">Psr\Log\LoggerInterface\Proxy</argument>
+        </arguments>
+    </type>
+
+    <type name="Vbdev\PaymentGuard\Service\OrderAttemptsService">
+        <arguments>
+            <argument name="modelPaymentGuardOrderAttemptsFactory" xsi:type="object">Vbdev\PaymentGuard\Model\PaymentGuardOrderAttemptsFactory\Proxy</argument>
+            <argument name="resourcePaymentGuardOrderAttemptsFactory" xsi:type="object">Vbdev\PaymentGuard\Model\ResourceModel\PaymentGuardOrderAttemptsFactory\Proxy</argument>
+            <argument name="resourcePaymentGuardOrderAttempts" xsi:type="object">Vbdev\PaymentGuard\Model\ResourceModel\PaymentGuardOrderAttempts\Proxy</argument>
+            <argument name="collectionFactory" xsi:type="object">Vbdev\PaymentGuard\Model\ResourceModel\PaymentGuardOrderAttempts\CollectionFactory\Proxy</argument>
+            <argument name="paymentGuardConfig" xsi:type="object">Vbdev\PaymentGuard\Model\Config\Proxy</argument>
+            <argument name="logger" xsi:type="object">Psr\Log\LoggerInterface\Proxy</argument>
+            <argument name="captureCustomerInfos" xsi:type="object">Vbdev\PaymentGuard\Service\CaptureCustomerInfos\Proxy</argument>
+            <argument name="orderService" xsi:type="object">Vbdev\PaymentGuard\Service\OrderService\Proxy</argument>
+        </arguments>
+    </type>
+
+    <type name="Vbdev\PaymentGuard\Service\BlacklistService">
+        <arguments>
+            <argument name="modelPaymentGuardBlacklistFactory" xsi:type="object">Vbdev\PaymentGuard\Model\PaymentGuardBlacklistFactory\Proxy</argument>
+            <argument name="resourcePaymentGuardBlacklistFactory" xsi:type="object">Vbdev\PaymentGuard\Model\ResourceModel\PaymentGuardBlacklistFactory\Proxy</argument>
+            <argument name="resourcePaymentGuardBlacklist" xsi:type="object">Vbdev\PaymentGuard\Model\ResourceModel\PaymentGuardBlacklist\Proxy</argument>
+            <argument name="collectionFactory" xsi:type="object">Vbdev\PaymentGuard\Model\ResourceModel\PaymentGuardBlacklist\CollectionFactory\Proxy</argument>
+            <argument name="logger" xsi:type="object">Psr\Log\LoggerInterface\Proxy</argument>
+        </arguments>
+    </type>
+
+    <type name="Vbdev\PaymentGuard\Service\OrderService">
+        <arguments>
+            <argument name="orderCollection" xsi:type="object">Magento\Sales\Model\ResourceModel\Order\CollectionFactory\Proxy</argument>
+            <argument name="logger" xsi:type="object">Psr\Log\LoggerInterface\Proxy</argument>
+            <argument name="paymentGuardConfig" xsi:type="object">Vbdev\PaymentGuard\Model\Config\Proxy</argument>
+            <argument name="captureCustomerInfos" xsi:type="object">Vbdev\PaymentGuard\Service\CaptureCustomerInfos\Proxy</argument>
+            <argument name="guardLogsService" xsi:type="object">Vbdev\PaymentGuard\Service\PaymentGuardLogsService\Proxy</argument>
+        </arguments>
+    </type>
 </config>
