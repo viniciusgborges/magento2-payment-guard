@@ -33,7 +33,8 @@ class OrderAttemptsService
             if ($this->paymentGuardConfig->getEnabled()) {
                 $customerId = $guest ? null : $this->captureCustomerInfos->getCustomerId();
                 $remoteIp = $this->captureCustomerInfos->getRemoteIp();
-                $this->createAttempt($customerId, $remoteIp);
+                $userEmail = $this->captureCustomerInfos->getCustomerEmail();
+                $this->createAttempt($customerId, $remoteIp, $userEmail);
 
                 if ($this->guardLogsService->checkIfUserIsOnBlacklist($this->guardLogsService->getBlacklistStatusByUserIp($remoteIp))) {
                     return true;
@@ -48,7 +49,7 @@ class OrderAttemptsService
                 $resultByRemoteIp = $this->getUserAttemptsByRemoteIp($remoteIp, $attemptsTime);
 
                 if ($resultByCustomerId > $attemptsLimit || $resultByRemoteIp > $attemptsLimit) {
-                    $userEmails = $this->captureCustomerInfos->getCustomerEmail();
+                    $userEmails = $this->getUserEmails($remoteIp);
                     $this->guardLogsService->populatePaymentGuardLogs($remoteIp, $userEmails);
                     return true;
                 }
@@ -60,7 +61,7 @@ class OrderAttemptsService
         return false;
     }
 
-    protected function createAttempt(?string $customerId, string $remoteIp): void
+    protected function createAttempt(?string $customerId, string $remoteIp, string $userEmail): void
     {
         try {
             $paymentGuardAttemptsModel = $this->getPaymentGuardOrderAttemptsModel();
@@ -68,6 +69,7 @@ class OrderAttemptsService
                 ->addData(
                     [
                         'user_id' => $customerId,
+                        'user_email' => $userEmail,
                         'user_ip' => $remoteIp
                     ]
                 );
@@ -117,6 +119,23 @@ class OrderAttemptsService
             $attemptsCollection->addFieldToFilter('created_at', ['from' => $dateFor, 'to' => $dateTo]);
 
             return $attemptsCollection;
+        } catch (Exception $exception) {
+            $this->logger->error($exception->getMessage());
+            return 0;
+        }
+    }
+
+    public function getUserEmails(string $remoteIp): string|int
+    {
+        try {
+            $attemptsCollection = $this->getPaymentGuardOrderAttemptsCollection();
+            if (!$attemptsCollection->getSize()) {
+                return 0;
+            }
+            $attemptsCollection->addFieldToFilter('user_ip', $remoteIp);
+            $attemptsCollection->getSelect()
+                ->group(array('user_email'));
+            return implode('<br>', $attemptsCollection->getColumnValues('user_email'));
         } catch (Exception $exception) {
             $this->logger->error($exception->getMessage());
             return 0;
