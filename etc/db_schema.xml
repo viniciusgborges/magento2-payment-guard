@@ -50,6 +50,7 @@
                 comment="Payment Guard Order Attempts ID"/>
         <column xsi:type="int" name="user_id" nullable="false" comment="User Id"/>
         <column xsi:type="varchar" name="user_ip" nullable="false" length="255" comment="IP"/>
+        <column xsi:type="text" name="user_email" nullable="false" comment="User Email"/>
         <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"
                 comment="Attempt Created at"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
