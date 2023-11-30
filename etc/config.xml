@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <payment_guard>
+            <vbdev_config>
+                <enabled>0</enabled>
+                <transaction_limit>0</transaction_limit>
+                <time_interval>0</time_interval>
+                <attempts_limit>0</attempts_limit>
+                <attempts_time_interval>0</attempts_time_interval>
+            </vbdev_config>
+        </payment_guard>
+    </default>
+</config>
