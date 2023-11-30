@@ -2,7 +2,7 @@
     "name": "vbdev/magento2-payment-guard",
     "description": "Magento 2 Payment Guard",
     "type": "magento2-module",
-    "version": "1.0.4",
+    "version": "1.1.0",
     "authors": [
         {
             "name": "Vinicius Borges",
