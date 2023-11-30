@@ -12,7 +12,7 @@ use Vbdev\PaymentGuard\Service\OrderAttemptsService;
 class PaymentInfoManagement
 {
     public function __construct(
-        protected OrderService $orderService,
+        protected OrderService         $orderService,
         protected OrderAttemptsService $orderAttemptsService
     ) {
     }

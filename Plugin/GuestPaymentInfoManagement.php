@@ -11,9 +11,8 @@ use Vbdev\PaymentGuard\Service\OrderAttemptsService;
 
 class GuestPaymentInfoManagement
 {
-
     public function __construct(
-        protected OrderService $orderService,
+        protected OrderService         $orderService,
         protected OrderAttemptsService $orderAttemptsService
     ) {
     }
@@ -28,7 +27,7 @@ class GuestPaymentInfoManagement
         PaymentInterface                           $paymentMethod,
         AddressInterface                           $billingAddress = null
     ): void {
-        if ($this->orderService->validate(true) || $this->orderAttemptsService->validateAttempts(true)) {
+        if ($this->orderService->validate() || $this->orderAttemptsService->validateAttempts()) {
             throw new LocalizedException(__("The order can't be placed."));
         }
     }

@@ -19,7 +19,7 @@ class OrderService
     ) {
     }
 
-    public function validate(bool $guest = false): bool
+    public function validate(): bool
     {
         try {
             if ($this->paymentGuardConfig->getEnabled()) {
@@ -29,19 +29,27 @@ class OrderService
                     return true;
                 }
 
-                $customerId = $guest ? null : $this->captureCustomerInfos->getCustomerId();
+                $customerId = $this->captureCustomerInfos->getCustomerId();
 
                 $time = $this->paymentGuardConfig->getTimeInterval();
                 $qty = $this->paymentGuardConfig->getTransactionLimit();
+
+                if (!$time && !$qty) {
+                    return false;
+                }
+
                 $resultByCustomerId = 0;
+                $resultByRemoteIp = 0;
                 if (!empty($customerId)) {
                     $resultByCustomerId = $this->getOrderResultCountByCustomerId($customerId, $time);
                 }
-                $resultByRemoteIp = $this->getOrderResultCountByRemoteIp($remoteIp, $time);
 
-                if ($resultByCustomerId > $qty || $resultByRemoteIp > $qty) {
-                    $userEmails = $this->getUserEmails($remoteIp);
-                    $this->guardLogsService->populatePaymentGuardLogs($remoteIp, $userEmails);
+                if (!empty($remoteIp)) {
+                    $resultByRemoteIp = $this->getOrderResultCountByRemoteIp($remoteIp, $time);
+                }
+
+                if ($resultByCustomerId >= $qty || $resultByRemoteIp >= $qty) {
+                    $this->guardLogsService->populatePaymentGuardLogs($remoteIp);
                     return true;
                 }
             }
@@ -86,25 +94,6 @@ class OrderService
             $orderCollection->addFieldToFilter('created_at', ['from' => $dateFor, 'to' => $dateTo]);
 
             return $orderCollection;
-        } catch (Exception $exception) {
-            $this->logger->error($exception->getMessage());
-            return 0;
-        }
-    }
-
-    public function getUserEmails($remoteIp): string|int
-    {
-        try {
-            $orderCollection = $this->getOrderCollection();
-            if (!$orderCollection && !$orderCollection->getSize()) {
-                return 0;
-            }
-            $orderCollection->addFieldToFilter('remote_ip', $remoteIp);
-            $orderCollection->getSelect()
-                ->reset(\Zend_Db_Select::COLUMNS)
-                ->columns('customer_email')
-                ->group(array('customer_email'));
-            return implode('<br>', $orderCollection->getColumnValues('customer_email'));
         } catch (Exception $exception) {
             $this->logger->error($exception->getMessage());
             return 0;

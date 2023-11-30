@@ -15,23 +15,22 @@ class CaptureCustomerInfos
         protected RemoteAddress         $remoteAddress,
         protected Session               $session,
         protected StoreManagerInterface $storeManager,
-    )
-    {
+    ) {
     }
 
-    public function getRemoteIp(): string
+    public function getRemoteIp(): ?string
     {
-        return $this->remoteAddress->getRemoteAddress();
+        return $this->remoteAddress?->getRemoteAddress();
     }
 
     public function getCustomerId(): ?int
     {
-        return $this->session->getCustomerId() ?: null;
+        return $this->session?->getCustomerId();
     }
 
-    public function getCustomerEmail(): string
+    public function getCustomerEmail(): ?string
     {
-        return $this->session->getCustomer()->getEmail();
+        return $this->session->getCustomer()?->getEmail();
     }
 
     public function getStoreName(): string

@@ -20,31 +20,31 @@ class PaymentGuardLogsService
         protected ResourcePaymentGuardLogsFactory $resourcePaymentGuardLogs,
         protected CollectionFactory               $collectionFactory,
         protected CaptureCustomerInfos            $captureCustomerInfos
-    )
-    {
+    ) {
     }
 
-    public function populatePaymentGuardLogs(string $remoteIp, string $userEmails): void
+    public function populatePaymentGuardLogs(string $remoteIp): void
     {
         try {
             $paymentGuardModelLogCollection = $this->getPaymentGuardLogCollection();
             $paymentGuardModelLogCollection->addFieldToFilter('user_ip', $remoteIp);
+            $userEmail = $this->captureCustomerInfos->getCustomerEmail();
             if (!$paymentGuardModelLogCollection->getSize()) {
-                $this->createNewPaymentGuardLog($remoteIp, $userEmails);
+                $this->createNewPaymentGuardLog($remoteIp, $userEmail);
             } else {
-                $this->updateExistingPaymentGuardLog($paymentGuardModelLogCollection, $userEmails);
+                $this->updateExistingPaymentGuardLog($paymentGuardModelLogCollection, $userEmail);
             }
         } catch (Exception $exception) {
             $this->logger->error($exception->getMessage());
         }
     }
 
-    private function createNewPaymentGuardLog(string $remoteIp, string $userEmails): void
+    private function createNewPaymentGuardLog(string $remoteIp, ?string $userEmail): void
     {
         try {
             $paymentGuardLogModel = $this->getPaymentGuardLogModel();
             $paymentGuardLogModel
-                ->setUserEmails($userEmails)
+                ->setUserEmails($userEmail)
                 ->setUserIp($remoteIp)
                 ->setStore($this->captureCustomerInfos->getStoreName())
                 ->setBlacklistStatus('unlocked')
@@ -56,13 +56,21 @@ class PaymentGuardLogsService
         }
     }
 
-    private function updateExistingPaymentGuardLog(Collection $paymentGuardLogCollection, string|int $userEmails): void
+    private function updateExistingPaymentGuardLog(Collection $paymentGuardLogCollection, ?string $userEmail): void
     {
         try {
             $paymentGuardLogItem = $paymentGuardLogCollection->getFirstItem();
-            if ($userEmails && ($paymentGuardLogItem->getUserEmails() !== $userEmails)) {
-                $paymentGuardLogItem->setUserEmails($userEmails);
+
+            $emailIsOnGrid = $userEmail
+                ? $this->checkIfUserEmailIsOnGrid($paymentGuardLogCollection, $userEmail)
+                : true;
+
+            if (!$emailIsOnGrid) {
+                $paymentGuardLogItem->getUserEmails()
+                    ? $paymentGuardLogItem->setUserEmails($paymentGuardLogItem->getUserEmails() . '<br>' . $userEmail)
+                    : $paymentGuardLogItem->setUserEmails($userEmail);
             }
+
             $attempts = $paymentGuardLogItem->getAttempts();
             $attempts++;
             $paymentGuardLogItem->setAttempts($attempts);
@@ -88,7 +96,7 @@ class PaymentGuardLogsService
     public function checkIfUserIsOnBlacklist(Collection|int $resultCollection): bool
     {
         try {
-            if ($resultCollection && $resultCollection->getSize()) {
+            if ($resultCollection->getSize()) {
                 $status = $resultCollection->getFirstItem()->getBlacklistStatus();
                 if ($status == 'blocked') {
                     return true;
@@ -99,6 +107,12 @@ class PaymentGuardLogsService
             return false;
         }
         return false;
+    }
+
+    public function checkIfUserEmailIsOnGrid(Collection $paymentGuardLogCollection, string $userEmail)
+    {
+        $gridUserEmails = explode('<br>', $paymentGuardLogCollection->getFirstItem()?->getUserEmails() ?? '');
+        return in_array($userEmail, $gridUserEmails, true);
     }
 
     public function getPaymentGuardLogModel(): PaymentGuardLogs
